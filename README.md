@@ -1,5 +1,6 @@
 # Icouse-Downloader
-icourse-downloader可以根据课程链接下载爱课程网（https://www.icourses.cn/home/）上的视频以及课件文档等
+icourse-downloader可以根据课程链接下载·[爱课程网](https://www.icourses.cn/home/)
+上的视频以及课件文档等
 ## 1.使用方法
 下载编译好的exe文件（windows平台）或者二进制文件（Linux和mac平台），在cmd或者终端里执行（链接可换成其它课程）
 ```bash

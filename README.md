@@ -12,12 +12,12 @@ icourse -c <option(all,most,videoPPT,assignments,testPaper,shareResource)> -o <o
 基本参数解释如下
 ```
 <option>	下载内容的选择，仅支持单选
-	all	下载全部内容
-    most	下载课件视频、课程作业以及课程试卷
-    videoPPT	仅下载课件视频
-    assignments	仅下载课程作业
-    testPaper	仅下载课程试卷
-    shareResource	仅下载其它公开资源
+all	下载全部内容
+most	下载课件视频、课程作业以及课程试卷
+videoPPT	仅下载课件视频
+assignments	仅下载课程作业
+testPaper	仅下载课程试卷
+shareResource	仅下载其它公开资源
 <outputPath>	指定下载路径
 <url-of-icourse>	课程主页的链接，格式同：http://www.icourses.cn/sCourse/course_6447.html
 ```

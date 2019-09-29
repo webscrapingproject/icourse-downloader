@@ -1,11 +1,13 @@
 # Icouse-Downloader
 icourse-downloader可以根据课程链接下载[爱课程网](https://www.icourses.cn/home/)
 上的视频以及课件文档等
-![](https://img.shields.io/github/repo-size/webscrapingproject/icourse-downloader)
+
+![](https://img.shields.io/github/repo-size/webscrapingproject/icourse-downloader) ![](https://img.shields.io/github/v/release/webscrapingproject/icourse-downloader)
 
 ## 1.使用方法
 下载编译好的exe文件（windows平台）或者二进制文件（Linux和mac平台），在cmd或者终端里执行（链接可换成其它课程）
 下载爱课程的视频课程：
+
 ```bash
 ./icourse http://www.icourses.cn/sCourse/course_6447.html
 ```
@@ -41,4 +43,3 @@ all	下载全部内容
 video	仅下载课件视频
 PPT	仅下载课程课件
 ```
-

@@ -43,7 +43,7 @@ func FileExists(filePath string) bool{
 
 //去除字符串里的空格换行等
 func Format(str string)string{
-	re := regexp.MustCompile("[\r\n\t]")
+	re := regexp.MustCompile("[\r\n\t ]")
 	res := re.ReplaceAllString(str, "")
 	return res
 }
@@ -74,6 +74,21 @@ func MatchAll(text, pattern string) [][]string {
 	return value
 }
 
+//获取url链接的域名
+// Domain get the domain of given URL
+func Domain(url string) string {
+	domainPattern := `([a-z0-9][-a-z0-9]{0,62})\.` +
+		`(com\.cn|com\.hk|` +
+		`cn|com|net|edu|gov|biz|org|info|pro|name|xxx|xyz|be|` +
+		`me|top|cc|tv|tt)`
+	domain := MatchOneOf(url, domainPattern)
+	if domain != nil {
+		return domain[1]
+	}
+	return "Universal"
+}
+
+
 //根据url,构造get请求
 func HttpGet(s string) string {
 	res, err := http.Get(s)
@@ -86,4 +101,33 @@ func HttpGet(s string) string {
 	}
 	body, err := ioutil.ReadAll(res.Body)
 	return string(body)
+}
+
+//根据url以及cookie构造get请求
+func HttpGetCookie(s string,cookie string) string {
+	client := &http.Client{}
+	reqest, err := http.NewRequest("GET", s, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	reqest.Header.Set("Cookie",cookie)
+	res, _ := client.Do(reqest)
+	defer res.Body.Close()
+	if res.StatusCode != 200 {
+		log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
+	}
+	body, err := ioutil.ReadAll(res.Body)
+	//fmt.Println(string(body))
+	return string(body)
+}
+
+//从文件中读取cookie
+func ReadCookieFromFile(filePath string){
+	//如果cookie是一个文件并且存在
+	if _, fileErr := os.Stat(config.Cookie); fileErr == nil {
+		// Cookie is a file
+		data, err := ioutil.ReadFile(config.Cookie)
+		Check(err)
+		config.Cookie = string(data)
+	}
 }

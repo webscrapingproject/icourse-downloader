@@ -8,7 +8,10 @@ var (
 	ContentOptions string
 	// 显示版本号
 	Version bool
+	// cookie 内容或者cookie文件地址
+	Cookie string
 )
+
 const VideoPPT="https://www.icourses.cn/web/sword/portal/shareChapter?cid="
 const Assignments="http://www.icourses.cn/web/sword/portal/assignments?cid="
 const TestPaper="http://www.icourses.cn/web/sword/portal/testPaper?cid="

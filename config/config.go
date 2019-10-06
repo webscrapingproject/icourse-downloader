@@ -16,3 +16,7 @@ const VideoPPT="https://www.icourses.cn/web/sword/portal/shareChapter?cid="
 const Assignments="http://www.icourses.cn/web/sword/portal/assignments?cid="
 const TestPaper="http://www.icourses.cn/web/sword/portal/testPaper?cid="
 const ShareResource="http://www.icourses.cn/web/sword/portal/sharerSource?cid="
+
+//中国大学mooc 两个dwr地址
+const GetMocTermDto = "https://www.icourse163.org/dwr/call/plaincall/CourseBean.getMocTermDto.dwr"
+const GetLessonUnitLearnVo = "https://www.icourse163.org/dwr/call/plaincall/CourseBean.getLessonUnitLearnVo.dwr"

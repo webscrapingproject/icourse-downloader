@@ -20,6 +20,7 @@ func DownloadFiles(files []utils.File,courseName string){
 	for _,file:=range(files){
 		//下载到指定文件夹
 		fmt.Println("\n"+filepath.Join(config.OutputPath,courseName,file.FilePATH))
+		//fmt.Println(file.FileURL)
 		DownloadFile(file.FileURL,filepath.Join(config.OutputPath,courseName,file.FilePATH))
 	}
 }

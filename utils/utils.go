@@ -6,9 +6,38 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"regexp"
+	"strconv"
+	"strings"
 )
+
+//unicode 转换为utf8
+func Unicode2utf8(source string) string {
+	var res = []string{""}
+	sUnicode := strings.Split(source, "\\u")
+	var context = ""
+	for _, v := range sUnicode {
+		var additional = ""
+		if len(v) < 1 {
+			continue
+		}
+		if len(v) > 4 {
+			rs := []rune(v)
+			v = string(rs[:4])
+			additional = string(rs[4:])
+		}
+		temp, err := strconv.ParseInt(v, 16, 32)
+		if err != nil {
+			context += v
+		}
+		context += fmt.Sprintf("%c", temp)
+		context += additional
+	}
+	res = append(res, context)
+	return strings.Join(res, "")
+}
 
 //定义结构体,数据包括文件的下载路径以及保存路径
 type File struct {
@@ -120,6 +149,28 @@ func HttpGetCookie(s string,cookie string) string {
 	//fmt.Println(string(body))
 	return string(body)
 }
+
+//输入post参数以及网址，返回post结果
+func HttpPostForm(postUrl string,postForm url.Values)string{
+	client := &http.Client{}
+	req, err := http.NewRequest("POST",postUrl,nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	req.Body = ioutil.NopCloser(strings.NewReader(postForm .Encode()))
+	res, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer res.Body.Close()
+	if res.StatusCode != 200 {
+		log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
+	}
+	body, err := ioutil.ReadAll(res.Body)
+	//fmt.Println(string(body))
+	return string(body)
+}
+
 
 //从文件中读取cookie
 func ReadCookieFromFile(filePath string){

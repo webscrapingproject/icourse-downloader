@@ -3,6 +3,7 @@ package parser
 import (
 	"fmt"
 	"icourse/utils"
+	"strconv"
 )
 
 //// Datacamp下载部分
@@ -64,7 +65,7 @@ func GetPK(url string)(string){
 //根据project key 返回视频和字幕的下载地址
 func GetDCVideo(url string)(string,string){
 	data:=utils.HttpGet(url)
-	videoUrl:= "https:"+utils.MatchAll(data,`video_mp4_link.*?(//videos.datacamp.com/transcoded_mp4/.*?mp4)`)[0][1]
+	videoUrl:= "https:"+utils.MatchAll(data,`video_mp4_link.*?(//.*?\.mp4)`)[0][1]
 	subtitleUrl := utils.MatchAll(data,`subtitle_vtt_link.*?(https.*?vtt)`)[0][1]
 	return videoUrl,subtitleUrl
 }
@@ -92,20 +93,23 @@ func ExtractDCVideo(url string)([]utils.File,[]utils.File){
 	var  renameList []string
 	//fmt.Println(urlList)
 	//对于每一个视频
-	for _,item := range(urlList){
+	for i,item := range(urlList){
 		PK := GetPK(item)
 		//添加下载链接
 		videoUrl,subtitleUrl := GetDCVideo(PK)
 		downloadList = append(downloadList,videoUrl )
 		downloadList = append(downloadList,subtitleUrl )
 		fileName := utils.MatchAll(videoUrl,`.*/(.*?).mp4`)[0][1]
+		newName := strconv.Itoa(i+1)
 		subtitleName := utils.MatchAll(subtitleUrl,`.*/(.*?.vtt)`)[0][1]
 		//添加重命名命令
-		renameCM := "ren "+subtitleName+" "+fileName+".vtt"
+		renameCM := "ren "+subtitleName+" "+newName+".vtt"
+		renameVideo := "ren "+fileName+" "+newName+".mp4"
 		fmt.Println(renameCM)
 		renameList = append(renameList,renameCM)
-		videos = append(videos, utils.File{videoUrl,fileName+".mp4"})
-		subtitles = append(subtitles, utils.File{subtitleUrl,fileName+".vtt"})
+		renameList = append(renameList,renameVideo)
+		videos = append(videos, utils.File{videoUrl,newName+".mp4"})
+		subtitles = append(subtitles, utils.File{subtitleUrl,newName+".vtt"})
 	}
 	utils.WriteFile("downloadList.txt",downloadList)
 	utils.WriteFile("rename.bat",renameList)

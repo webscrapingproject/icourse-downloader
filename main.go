@@ -1,11 +1,11 @@
 package main
 
 import (
-	"flag"
-	"fmt"
 	"icourse/config"
 	"icourse/parser"
 	"icourse/utils"
+	"flag"
+	"fmt"
 	"os"
 	"strings"
 )
@@ -16,7 +16,7 @@ import (
 func init() {
 	flag.BoolVar(&config.Version, "v", false, "Show version")
 	//all为全部下载，most为视频课件以及试卷，也为下载默认选项，videoPPT仅下载视频和课件，exams为仅下载试卷，resources仅下载其它资源
-	flag.StringVar(&config.ContentOptions, "co", "all", "Only for icourse : Specify the download content {all,most,videoPPT,assignments,testPaper,shareResource}\nOnly for chinesemooc : Specify the download content {all, video , PPT}\nOnly for Icourse163 : Specify the download content {all, video , PPT , RichText}")
+	flag.StringVar(&config.ContentOptions, "co", "all", "Only for icourse : Specify the download content {all,most,videoPPT,assignments,testPaper,shareResource}\nOnly for chinesemooc : Specify the download content {all, video , PPT}\nOnly for Icourse163 : Specify the download content {all, video , PPT , RichText}\nOnly for Datacamp : all the content links will be extracted")
 	//华文慕课的下载选项，只有三个:全部下载（默认），只下载视频 以及 只下载课件
 	//中国大学mooc的下载选项：全部下载（默认），只下载视频，只下载课件以及只下载富文本文件
 
@@ -36,6 +36,9 @@ func download(url string) bool {
 		parser.DownloadChinesemooc(url,config.ContentOptions,config.Cookie)
 	case "icourse163":
 		parser.DownloadIcourse163(url,config.ContentOptions)
+
+	case "datacamp":
+		parser.DownloadDatacamp(url,config.ContentOptions)
 	default:
 		fmt.Println("The website is not supported now ")
 		return false
@@ -45,7 +48,7 @@ func download(url string) bool {
 
 func main() {
 	//此处参考了annie的代码
-	//fmt.Println(parser.GetStartURLs("http://www.chinesemooc.org/mooc/4880","pku_auth=161evS%2BQJtmq%2FGJRyU%2BFhfaNLyG88SrUPqUX5a0eOUW49JVtBaPxY7lt1vp2MvvcC9UaH8qYx3%2B0cSja0MeVNCmDSWRQ; pku_loginuser=univeroner%40gmail.com; pku_reward_log=daylogin%2C1173273; Hm_lvt_ff4f6e9862a4e0e16fd1f5a7f6f8953b=1569321857,1569494843,1569494850,1569759380; PHPSESSID=p72d5gqftbmp65mmr2n9ghrah5; pku__refer=%252Fmooc%252F4880; Hm_lpvt_ff4f6e9862a4e0e16fd1f5a7f6f8953b=1569761588"))
+	//fmt.Println(parser.GetDCStartURLs("https://campus.datacamp.com/courses/data-visualization-with-ggplot2-2"))
 
 	flag.Parse()
 	args := flag.Args()

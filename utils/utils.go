@@ -12,6 +12,28 @@ import (
 	"strconv"
 	"strings"
 )
+//将字符串写入某个文件
+func WriteFile(fileName string,content []string){
+	f, err := os.Create(fileName)
+	if err != nil {
+		fmt.Println(err)
+		f.Close()
+		return
+	}
+	for _, v := range content {
+		_, err:=fmt.Fprintln(f, v)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+	}
+	err = f.Close()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+}
+
 
 //unicode 转换为utf8
 func Unicode2utf8(source string) string {
@@ -120,6 +142,14 @@ func Domain(url string) string {
 
 //根据url,构造get请求
 func HttpGet(s string) string {
+	//proxy := func(_ *http.Request) (*url.URL, error) {
+	//	return url.Parse("http://127.0.0.1:8888")
+	//}
+	//
+	//transport := &http.Transport{Proxy: proxy}
+	//
+	//client := &http.Client{Transport: transport}
+	//res, err := client.Get(s)
 	res, err := http.Get(s)
 	if err != nil {
 		log.Fatal(err)

@@ -1,5 +1,6 @@
 # Icouse-Downloader
-icourse-downloader可以根据课程链接下载[爱课程网](https://www.icourses.cn/home/), [华文慕课](http://www.chinesemooc.org)以及[中国大学MOOC](https://www.icourse163.org) 上的视频以及课件文档等
+icourse-downloader可以根据课程链接下载[爱课程网](https://www.icourses.cn/home/)、 [华文慕课](http://www.chinesemooc.org)、[中国大学MOOC](https://www.icourse163.org) 以及
+[datacamp](https://www.datacamp.com/)上的视频以及课件文档等
 
 ![](https://img.shields.io/github/repo-size/webscrapingproject/icourse-downloader) ![](https://img.shields.io/github/v/release/webscrapingproject/icourse-downloader)
 
@@ -17,6 +18,10 @@ icourse-downloader可以根据课程链接下载[爱课程网](https://www.icour
 下载中国大学MOOC的课程：
 ```bash
 ./icourse https://www.icourse163.org/learn/SDU-1001907001?tid=1003113029
+```
+获取datacamp的课程资料下载链接
+```bash
+./icourse https://learn.datacamp.com/courses/data-visualization-with-ggplot2-part-3
 ```
 ## 2. 参数说明
 ### 2.1 爱课程下载参数
@@ -59,3 +64,14 @@ video	仅下载课件视频
 videoPPT	仅下载课程课件
 RichText	仅下载课程富文本附件
 ```
+### 2.4 datacamp下载参数
+```
+icourse -o <outputPath> <url-of-datacamp>
+```
+默认获得视频文件、字幕文件以及课件文件的下载地址保存在文件中，并生成重命名的批处理文件
+
+## 相关博文
+
+1. https://blog.univerone.com/post/34-datacamp-video-download/
+
+2. https://blog.univerone.com/post/23-go-icourse-downloader/

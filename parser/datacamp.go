@@ -100,13 +100,13 @@ func ExtractDCVideo(url string)([]utils.File,[]utils.File){
 		videoUrl,subtitleUrl := GetDCVideo(PK)
 		downloadList = append(downloadList,videoUrl )
 		downloadList = append(downloadList,subtitleUrl )
-		fileName := utils.MatchAll(videoUrl,`.*/(.*?).mp4`)[0][1]
+		fileName := utils.MatchAll(videoUrl,`.*/(.*?.mp4)`)[0][1]
 		newName := strconv.Itoa(i+1)
 		subtitleName := utils.MatchAll(subtitleUrl,`.*/(.*?.vtt)`)[0][1]
 		//添加重命名命令
 		renameCM := "ren "+subtitleName+" "+newName+".vtt"
 		renameVideo := "ren "+fileName+" "+newName+".mp4"
-		fmt.Println(renameCM)
+		fmt.Println(renameVideo)
 		renameList = append(renameList,renameCM)
 		renameList = append(renameList,renameVideo)
 		videos = append(videos, utils.File{videoUrl,newName+".mp4"})

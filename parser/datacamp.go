@@ -65,7 +65,7 @@ func GetPK(url string)(string){
 //根据project key 返回视频和字幕的下载地址
 func GetDCVideo(url string)(string,string){
 	data:=utils.HttpGet(url)
-	videoUrl:= "https:"+utils.MatchAll(data,`video_mp4_link.*?(//.*?\.mp4)`)[0][1]
+	videoUrl:= "https:"+utils.MatchAll(data,`video_mp4_link.*?(//.*?)&quot;`)[0][1]
 	subtitleUrl := utils.MatchAll(data,`subtitle_vtt_link.*?(https.*?vtt)`)[0][1]
 	return videoUrl,subtitleUrl
 }

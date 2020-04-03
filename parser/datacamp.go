@@ -66,6 +66,7 @@ func GetPK(url string)(string){
 func GetDCVideo(url string)(string,string){
 	data:=utils.HttpGet(url)
 	videoUrl:= "https:"+utils.MatchAll(data,`video_mp4_link.*?(//.*?)&quot;`)[0][1]
+	videoUrl = utils.Replace(videoUrl,"amp;","")
 	subtitleUrl := utils.MatchAll(data,`subtitle_vtt_link.*?(https.*?vtt)`)[0][1]
 	return videoUrl,subtitleUrl
 }

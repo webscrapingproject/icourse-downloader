@@ -99,6 +99,14 @@ func Format(str string)string{
 	return res
 }
 
+//替换
+func Replace(str string,pattern string,new string)string{
+	re := regexp.MustCompile(pattern)
+	res := re.ReplaceAllString(str, new)
+	return res
+}
+
+
 // 符合某一个正则表达式
 func MatchOneOf(text string, patterns ...string) []string {
 	var (

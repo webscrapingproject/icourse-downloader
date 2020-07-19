@@ -1,16 +1,32 @@
-name: goreleaser
+name: ci
 
 on:
   pull_request:
+    branches:
+      - master
+      - releases/v*
   push:
+    branches:
+      - master
+      - releases/v*
 
 jobs:
-  goreleaser:
-    runs-on: ubuntu-latest
+  ci:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macOS-latest
+          - windows-latest
+        version:
+          - latest
+          - v0.117.0
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.3.1
         with:
           fetch-depth: 0
       -
@@ -19,10 +35,58 @@ jobs:
         with:
           go-version: 1.14
       -
-        name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v2
+        name: Check
+        uses: ./
+        with:
+          version: ${{ matrix.version }}
+          args: check --debug
+      -
+        name: GoReleaser
+        uses: ./
+        with:
+          version: ${{ matrix.version }}
+          args: release --skip-publish --rm-dist
+
+  signing:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macOS-latest
+          - windows-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2.3.1
+        with:
+          fetch-depth: 0
+      -
+        name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.14
+      -
+        name: Import GPG key
+        id: import_gpg
+        uses: crazy-max/ghaction-import-gpg@v2
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY_TEST }}
+          PASSPHRASE: ${{ secrets.PASSPHRASE_TEST }}
+      -
+        name: Check
+        uses: ./
         with:
           version: latest
-          args: release --rm-dist
+          args: -f .goreleaser-signing.yml check --debug
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
+      -
+        name: GoReleaser
+        uses: ./
+        with:
+          version: latest
+          args: -f .goreleaser-signing.yml release --skip-publish --rm-dist
+        env:
+          GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}

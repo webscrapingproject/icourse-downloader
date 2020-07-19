@@ -2,7 +2,7 @@ package download
 
 import (
 	"fmt"
-	"github.com/schollz/progressbar"
+	"github.com/schollz/progressbar/v2"
 	"icourse/config"
 	"icourse/utils"
 	"io"

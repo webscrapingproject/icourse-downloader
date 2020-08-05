@@ -19,7 +19,6 @@ func init() {
 	flag.StringVar(&config.ContentOptions, "co", "all", "Only for icourse : Specify the download content {all,most,videoPPT,assignments,testPaper,shareResource}\nOnly for chinesemooc : Specify the download content {all, video , PPT}\nOnly for Icourse163 : Specify the download content {all, video , PPT , RichText}\nOnly for Datacamp : all the content links will be extracted")
 	//华文慕课的下载选项，只有三个:全部下载（默认），只下载视频 以及 只下载课件
 	//中国大学mooc的下载选项：全部下载（默认），只下载视频，只下载课件以及只下载富文本文件
-
 	//设置下载路径
 	flag.StringVar(&config.OutputPath, "o", "", "Specify the output path")
 	//设置cookie
@@ -35,8 +34,7 @@ func download(url string) bool {
 		//fmt.Println("SUCCESS")
 		parser.DownloadChinesemooc(url,config.ContentOptions,config.Cookie)
 	case "icourse163":
-		parser.DownloadIcourse163(url,config.ContentOptions)
-
+		parser.DownloadIcourse163(url,config.ContentOptions,config.Cookie)
 	case "datacamp":
 		parser.DownloadDatacamp(url,config.ContentOptions)
 	default:

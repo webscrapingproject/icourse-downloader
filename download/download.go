@@ -95,7 +95,6 @@ func getFileSize(url string) int64 {
 func aria2Download(url string,filePath string){
 }
 
-
 func DownloadFile(url string,filePath string){
 	//获取需要下载的文件大小
 	dataSize:=getFileSize(url)

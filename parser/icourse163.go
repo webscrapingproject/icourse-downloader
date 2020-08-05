@@ -6,6 +6,7 @@ import (
 	"icourse/config"
 	"icourse/download"
 	"icourse/utils"
+	"io/ioutil"
 	"net/url"
 	"path/filepath"
 	"strconv"
@@ -36,7 +37,7 @@ func HttpPostTermID(ID string)string {
 }
 
 //从总的文件信息中提取出单个文件,返回三种文件的list
-func ExtractIcourse163Res (text string)([]utils.File,[]utils.File,[]utils.File){
+func ExtractIcourse163Res (text string,cookie string)([]utils.File,[]utils.File,[]utils.File){
 	//三种不同类型的资源
 	videoList := []utils.File{}
 	pdfList := []utils.File{}
@@ -51,7 +52,7 @@ func ExtractIcourse163Res (text string)([]utils.File,[]utils.File,[]utils.File){
 			videos := utils.MatchAll(text, "contentId=([0-9]*).+contentType=(1).*id=([0-9]*).+lessonId=" +
 				lesson[1] + ".*name=\"(.*)\"")
 			for num,video:= range videos{
-				videoURL:= parseIcourse163Video(Icourse163File{contentID:video[1],typeID:video[2],ID:video[3]},"HD")
+				videoURL:= parseIcourse163Video(video[3],cookie,1)
 				videoPath := utils.Unicode2utf8(filepath.Join(chapter[2],lesson[2],strconv.Itoa(num+1)+ "-" + video[4] + ".mp4")) //添加文件编号以及后缀
 				videoList = append(videoList,utils.File{FilePATH:videoPath,FileURL:videoURL})
 			}
@@ -80,12 +81,12 @@ func ExtractIcourse163Res (text string)([]utils.File,[]utils.File,[]utils.File){
 	return videoList,pdfList,richTextList
 }
 
-//从单个文件的id等信息提取其下载地址（需要构造post请求）
+//从单个pdf文件的id等信息提取其下载地址（需要构造post请求）
 func parseIcourse163File(content Icourse163File)string{
 	requestBody := url.Values{
 		"callCount":{"1"},
 		"scriptSessionId": {"${scriptSessionId}190"},
-		"httpSessionId":{"c662f9cfbe7241b09927ff837c5d2ddc"},
+		"httpSessionId":{"c47c239c3d414133b309532a7a8c2783"},
 		"c0-scriptName":{"CourseBean"},
 		"c0-methodName":{"getLessonUnitLearnVo"},
 		"c0-id":{"0"},
@@ -99,19 +100,31 @@ func parseIcourse163File(content Icourse163File)string{
 }
 
 
-//从视频文件的解析结果中提取网址,输入清晰度，输出下载地址,默认hd
-func parseIcourse163Video(content Icourse163File,videoType string)string{
-	text := parseIcourse163File(content)
-	//fmt.Println(text)
-	//优先下载清晰度高的视频
-	mp4HdUrl := utils.MatchAll(text,"mp4HdUrl=\"(http.*_hd.mp4.*?)\"")
-	mp4SdUrl := utils.MatchAll(text,"mp4SdUrl=\"(http.*_sd.mp4.*?)\"")
-	if (mp4HdUrl != nil){
-		return mp4HdUrl[0][1]
-	} else if (mp4SdUrl != nil){
-		return mp4SdUrl[0][1]
+// 从单个视频的id等信息提取其下载地址（需要构造post请求）
+func parseIcourse163VideoFile(ID string, cookie string)string{
+	requestBody := url.Values{
+		"bizId": { ID },
+		"bizType" : {"1"},
+		"contentType": {"1"},
 	}
-	//fmt.Println(mp4HdUrl)
+	csrfKey := GetCsrfKey(cookie)
+	sigText:= utils.HttpPostCookie(config.GetResourceToken+csrfKey,cookie,requestBody)
+	signature := utils.MatchAll(sigText,"signature\":\"(.*?)\"")[0][1]
+	videoId := utils.MatchAll(sigText,"videoId\":([0-9]*?),")[0][1]
+	videoDownloadUrl := fmt.Sprintf("%s?videoId=%s&signature=%s&clientType=1", config.GetVideo, videoId, signature)
+	return utils.HttpGet(videoDownloadUrl)
+}
+
+//从视频文件的解析结果中提取网址,输入清晰度，输出下载地址,默认hd
+func parseIcourse163Video(contentID string,cookie string,quality int) string {
+	text := parseIcourse163VideoFile(contentID,cookie)
+	//优先下载清晰度高的视频
+	hlsUrl := utils.MatchAll(text,"\"videoUrl\":\"(http.*?)\",")
+	if (len(hlsUrl) > quality ){
+		return hlsUrl[quality-1][1]
+	} else if (hlsUrl != nil){
+		return hlsUrl[0][1]
+	}
 	return ""
 }
 
@@ -145,26 +158,33 @@ func GetIcourse163Name(url string)string{
 	return courseName
 }
 
-
+//从cookie中得到csrfKey
+func GetCsrfKey(cookie string)string{
+	return utils.MatchAll(cookie,"NTESSTUDYSI=(.*?);")[0][1];
+}
 
 //总的解析函数
-func DownloadIcourse163(url string,options string)bool{
+func DownloadIcourse163(url string,options string,cookie string)bool{
+	if utils.FileExists(cookie){
+		data, _ := ioutil.ReadFile(cookie)
+		cookie = string(data)
+	}
 	courseName := GetChinesemoocName(url)
 	termId := utils.MatchAll(url,"tid=([0-9]*)")
 	if termId != nil{
 		termIDNum := termId[0][1]
 		//所有文件信息
 		text := HttpPostTermID(termIDNum)
-		Icourse163Video,Icourse163PPT,Icourse163RichText := ExtractIcourse163Res(text)
+		Icourse163Video,Icourse163PPT,Icourse163RichText := ExtractIcourse163Res(text,cookie)
 		switch options{
 			//下载所有文件
 			case "all":
-				download.DownloadFiles(Icourse163Video,courseName)
+				utils.M3u8DownloadList(Icourse163Video,courseName)
 				download.DownloadFiles(Icourse163PPT,courseName)
 				download.DownloadFiles(Icourse163RichText,courseName)
 			//只下载视频文件
 			case "video":
-				download.DownloadFiles(Icourse163Video,courseName)
+				utils.M3u8DownloadList(Icourse163Video,courseName)
 			//只下载ppt文件
 			case "PPT":
 				download.DownloadFiles(Icourse163PPT,courseName)

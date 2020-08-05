@@ -17,6 +17,8 @@ const Assignments="http://www.icourses.cn/web/sword/portal/assignments?cid="
 const TestPaper="http://www.icourses.cn/web/sword/portal/testPaper?cid="
 const ShareResource="http://www.icourses.cn/web/sword/portal/sharerSource?cid="
 
-//中国大学mooc 两个dwr地址
-const GetMocTermDto = "https://www.icourse163.org/dwr/call/plaincall/CourseBean.getMocTermDto.dwr"
+//中国大学mooc 三个地址
+const GetMocTermDto = "https://www.icourse163.org/dwr/call/plaincall/CourseBean.getLastLearnedMocTermDto.dwr"
+const GetVideo = "https://vod.study.163.com/eds/api/v1/vod/video"
+const GetResourceToken = "https://www.icourse163.org/web/j/resourceRpcBean.getResourceToken.rpc?csrfKey="
 const GetLessonUnitLearnVo = "https://www.icourse163.org/dwr/call/plaincall/CourseBean.getLessonUnitLearnVo.dwr"

@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -114,9 +115,6 @@ func MatchOneOf(text string, patterns ...string) []string {
 		value []string
 	)
 	for _, pattern := range patterns {
-		// (?flags): set flags within current group; non-capturing
-		// s: let . match \n (default false)
-		// https://github.com/google/re2/wiki/Syntax
 		re = regexp.MustCompile(pattern)
 		value = re.FindStringSubmatch(text)
 		if len(value) > 0 {
@@ -150,14 +148,6 @@ func Domain(url string) string {
 
 //根据url,构造get请求
 func HttpGet(s string) string {
-	//proxy := func(_ *http.Request) (*url.URL, error) {
-	//	return url.Parse("http://127.0.0.1:8888")
-	//}
-	//
-	//transport := &http.Transport{Proxy: proxy}
-	//
-	//client := &http.Client{Transport: transport}
-	//res, err := client.Get(s)
 	res, err := http.Get(s)
 	if err != nil {
 		log.Fatal(err)
@@ -179,6 +169,29 @@ func HttpGetCookie(s string,cookie string) string {
 	}
 	reqest.Header.Set("Cookie",cookie)
 	res, _ := client.Do(reqest)
+	defer res.Body.Close()
+	if res.StatusCode != 200 {
+		log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
+	}
+	body, err := ioutil.ReadAll(res.Body)
+	//fmt.Println(string(body))
+	return string(body)
+}
+
+//根据url以及cookie构造post请求
+func HttpPostCookie(s string,cookie string,postForm url.Values) string {
+	client := &http.Client{}
+	req, err := http.NewRequest("POST", s, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("Cookie",cookie)
+	req.Body = ioutil.NopCloser(strings.NewReader(postForm .Encode()))
+	res, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
 		log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
@@ -219,4 +232,20 @@ func ReadCookieFromFile(filePath string){
 		Check(err)
 		config.Cookie = string(data)
 	}
+}
+
+//输入视频文件列表，返回ffmpeg下载命令的列表
+func M3u8DownloadList(files []File,courseName string) {
+	var  downloadList []string
+	for _,file:=range(files){
+		//检查目录是否存在
+		filePath := filepath.Join(config.OutputPath,courseName,file.FilePATH)
+		if _, err := os.Stat(filepath.Dir(filePath)); os.IsNotExist(err) {
+			//建立目录
+			_ = os.MkdirAll(filepath.Dir(filePath), os.ModePerm)
+		}
+		command := fmt.Sprintf("ffmpeg -i '%s' -codec copy '%s'",file.FileURL,file.FilePATH)
+		downloadList = append(downloadList,command)
+	}
+	WriteFile(filepath.Join(config.OutputPath,courseName,"downloadlist.txt"),downloadList)
 }

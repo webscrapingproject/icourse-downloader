@@ -13,7 +13,7 @@ Currently supported wesites:
 
 ## 1. Uages
 
-Download pre-compiled .exe file（for windows）or binary file（for Linux and mac
+Download pre-compiled .exe file(for windows) or binary file(for Linux and mac)
 
 ### 1.1 Icourses
 

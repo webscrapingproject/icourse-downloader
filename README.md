@@ -1,6 +1,6 @@
 # Icouse-Downloader
 
-icourse-downloader is a simple tool to 
+icourse-downloader is a simple tool to download course materials of mooc courses
 
 ![repo-size](https://img.shields.io/github/repo-size/webscrapingproject/icourse-downloader) ![release](https://img.shields.io/github/v/release/webscrapingproject/icourse-downloader)
 
